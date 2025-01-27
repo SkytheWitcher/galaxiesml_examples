@@ -346,8 +346,8 @@ class HDF5DataGenerator(Sequence):
                 numerical_data = self.__get_dataset_items(indices, key)
                 batch_numerical.append(numerical_data)
             batch_numerical = np.stack(batch_numerical, axis=-1)
-            return ((batch_images, batch_numerical),)
-    
+            # Return format: [images, numerical_data]
+            return [batch_images, batch_numerical]
         else:
             return batch_images
 
@@ -370,7 +370,6 @@ class HDF5DataGenerator(Sequence):
         # Grab samples (tensors, labels) HDF5 source file.
         (batch_images, batch_y) = self.__get_dataset_items(indices)
         
-
         # Shall we apply any data augmentation?
         if self.augmenter:
             batch_images = np.stack(
@@ -387,13 +386,16 @@ class HDF5DataGenerator(Sequence):
                 smooth_factor=self.smooth_factor
                 if self.labels_encoding == "smooth" else None,
             )
+            
+        # Always get numerical data when numerical_keys is provided
         if self.numerical_keys is not None:    
             batch_numerical = []
             for key in self.numerical_keys:
                 numerical_data = self.__get_dataset_items(indices, key)
                 batch_numerical.append(numerical_data)
             batch_numerical = np.stack(batch_numerical, axis=-1)
-            return ((batch_images, batch_numerical), batch_y)
+            # Return format: ([images, numerical_data], labels)
+            return ([batch_images, batch_numerical], batch_y)
         else:
             return (batch_images, batch_y)
 
