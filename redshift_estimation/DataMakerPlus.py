@@ -1,4 +1,3 @@
-
 from __future__ import absolute_import
 
 from typing import Tuple, Union, Optional
@@ -199,7 +198,14 @@ class HDF5DataGenerator(Sequence):
                 else:
                     return file[dataset][indices]
             else:
-                return (file[self.image_key][indices], file[self.y_key][indices])
+                # Get the data
+                images = file[self.image_key][indices]
+                labels = file[self.y_key][indices]
+                
+                # Transpose images from (batch, channels, height, width) to (batch, height, width, channels)
+                images = np.transpose(images, (0, 2, 3, 1))
+                
+                return (images, labels)
     
     @property
     def num_items(self) -> int:
