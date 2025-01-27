@@ -13,6 +13,7 @@ from scipy.stats import median_abs_deviation
 from sklearn.metrics import mean_squared_error
 import math
 import numpy as np
+import tensorflow as tf
 
 
 ######################
@@ -297,22 +298,27 @@ def calculate_outlier_rate(z_photo, z_spec, conventional=False):
     return eta
 
 
-def calculate_loss(z_photo, z_spec):
+def calculate_loss(y_true, y_pred):
     """
-    HSC METRIC. Returns an array. Loss is accuracy metric defined by HSC, meant
-    to capture the effects of bias, scatter, and outlier all in one. This has
-    uses for both point and density estimation.
-
-    z_photo: array
-        Photometric or predicted redshifts.
-    z_spec: array
-        Spectroscopic or actual redshifts.
+    Custom loss function for photometric redshift estimation.
+    Uses TensorFlow operations instead of NumPy.
     """
-    dz = delz(z_photo, z_spec)
+    # Convert inputs to float32 tensors
+    y_true = tf.cast(y_true, tf.float32)
+    y_pred = tf.cast(y_pred, tf.float32)
+    
+    # Calculate delta z
+    dz = (y_pred - y_true) / (1.0 + y_true)
+    
+    # Parameters for the loss function
     gamma = 0.15
-    denominator = 1.0 + np.square(dz/gamma)
-    L = 1 - 1.0 / denominator
-    return L
+    alpha = 1.0
+    
+    # Calculate loss using TensorFlow operations
+    denominator = 1.0 + tf.square(dz/gamma)
+    loss = alpha * tf.reduce_mean(1.0 - 1.0/denominator)
+    
+    return loss
 
 
 def calculate_percentage_change(i, j):
