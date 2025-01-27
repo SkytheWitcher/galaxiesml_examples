@@ -14,8 +14,11 @@ from sklearn.preprocessing import StandardScaler
 from tensorboard.plugins.hparams import api as hp
 import argparse
 import sys
-from typing import Dict, List, Tuple
 
+# Add the parent directory to the Python path so we can import config.py
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from typing import Dict, List, Tuple
 from photoz_utils import *
 from DataMakerPlus import *
 from config import get_dataset_paths

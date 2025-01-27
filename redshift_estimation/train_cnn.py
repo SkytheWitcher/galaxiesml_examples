@@ -34,7 +34,7 @@ def parse_args():
 
 def setup_paths(model_name):
     """Setup paths for model checkpoints and logs."""
-    checkpoint_filepath = os.path.join(MODEL_DIR, model_name, 'checkpoints/cp.ckpt')
+    checkpoint_filepath = os.path.join(MODEL_DIR, model_name, 'checkpoints/model.weights.h5')
     checkpoint_dir = os.path.dirname(checkpoint_filepath)
     log_dir = os.path.join(LOG_DIR, model_name)
     
