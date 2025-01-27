@@ -106,8 +106,10 @@ class HDF5DataGenerator(Sequence):
         smooth_factor=0.1,
         augmenter=False,
         mode="train",
+        **kwargs
     ):
-
+        super().__init__()  # Call parent class constructor
+        
         if mode not in available_modes:
             raise ValueError('`mode` should be `train` '
                              '(fit_generator() and evaluate_generator()) or '
@@ -319,20 +321,7 @@ class HDF5DataGenerator(Sequence):
         return batch_images.astype("float32") / 255.0
 
     def __next_batch_test(self, indices: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
-        """Generates a batch of test data for the given indices.
-        
-        Arguments
-        ---------
-        index : int
-            The index for the batch.
-            
-        Returns
-        -------
-        tuple of ndarrays
-            A tuple containing a batch of image tensors
-            and their associated labels. Numerical data
-            tensor is optional for mutli-modal models.
-        """
+        """Generates a batch of test data for the given indices."""
         # Grab corresponding images from the HDF5 source file.
         batch_images = self.__get_dataset_items(indices, self.image_key)
        
@@ -346,27 +335,13 @@ class HDF5DataGenerator(Sequence):
                 numerical_data = self.__get_dataset_items(indices, key)
                 batch_numerical.append(numerical_data)
             batch_numerical = np.stack(batch_numerical, axis=-1)
-            # Return format: [images, numerical_data]
-            return [batch_images, batch_numerical]
+            # Return format: (images, numerical_data)
+            return (batch_images, batch_numerical)
         else:
             return batch_images
 
-    def __next_batch(self,
-                     indices: np.ndarray) -> Tuple[Tuple[np.ndarray, np.ndarray], np.ndarray]:
-        """Generates a batch of train/val data for the given indices.
-        
-        Arguments
-        ---------
-        index : int
-            The index for the batch.
-            
-        Returns
-        -------
-        tuple of ndarrays
-            A tuple containing a batch of image tensors
-            and their associated labels. Numerical data
-            tensor is optional for mutli-modal models.
-        """
+    def __next_batch(self, indices: np.ndarray) -> Tuple[Tuple[np.ndarray, np.ndarray], np.ndarray]:
+        """Generates a batch of train/val data for the given indices."""
         # Grab samples (tensors, labels) HDF5 source file.
         (batch_images, batch_y) = self.__get_dataset_items(indices)
         
@@ -394,8 +369,8 @@ class HDF5DataGenerator(Sequence):
                 numerical_data = self.__get_dataset_items(indices, key)
                 batch_numerical.append(numerical_data)
             batch_numerical = np.stack(batch_numerical, axis=-1)
-            # Return format: ([images, numerical_data], labels)
-            return ([batch_images, batch_numerical], batch_y)
+            # Return format: ((images, numerical_data), labels)
+            return ((batch_images, batch_numerical), batch_y)
         else:
             return (batch_images, batch_y)
 
