@@ -29,7 +29,7 @@ GPU_MEMORY_LIMIT = int(os.getenv('GALAXIESML_GPU_MEMORY', '15'))  # in GB
 
 # Model Parameters
 MODEL_PARAMS = {
-    'image_shape': (5, 127, 127),
+    'image_shape': (127, 127, 5),
     'num_dense_units': 200,
     'batch_size': 256,
     'learning_rate': 0.0001,
